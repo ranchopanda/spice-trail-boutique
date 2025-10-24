@@ -1,7 +1,8 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
-import FeaturedProducts from "@/components/FeaturedProducts";
+
+import ProductGrid from "@/components/ProductGrid";
 import VideoShowcase from "@/components/VideoShowcase";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import Mission from "@/components/Mission";
@@ -14,7 +15,7 @@ const Index = () => {
       <main>
         <Hero />
         <Categories />
-        <FeaturedProducts />
+        <ProductGrid />
         <VideoShowcase />
         <TestimonialsCarousel />
         <Mission />

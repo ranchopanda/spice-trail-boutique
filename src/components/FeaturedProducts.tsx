@@ -6,7 +6,7 @@ import { ShoppingCart, Heart, Eye, Star, Package, Truck, Shield } from "lucide-r
 import vegetablesImg from "@/assets/products-vegetables.jpg";
 import spicesImg from "@/assets/products-spices.jpg";
 import grainsImg from "@/assets/products-grains.jpg";
-import ProductDetailModal from "./ProductDetailModal";
+
 import { ScrollAnimationWrapper } from "@/components/ui/scroll-animation-wrapper";
 
 interface Product {
@@ -420,43 +420,7 @@ const FeaturedProducts = () => {
         </motion.div>
       </div>
 
-      <ProductDetailModal
-        product={selectedProduct ? {
-          id: selectedProduct.id.toString(),
-          name: selectedProduct.name,
-          description: selectedProduct.description,
-          shortDescription: selectedProduct.description,
-          brand: "Natural Harvest",
-          price: parseInt(selectedProduct.price.replace(/[₹,]/g, '')),
-          originalPrice: selectedProduct.originalPrice ? parseInt(selectedProduct.originalPrice.replace(/[₹,]/g, '')) : undefined,
-          rating: selectedProduct.rating || 4.5,
-          reviewCount: selectedProduct.reviewCount || 0,
-          inStock: selectedProduct.inStock,
-          stockLevel: selectedProduct.inStock ? parseInt(selectedProduct.stockLevel === 'high' ? '100' : selectedProduct.stockLevel === 'medium' ? '50' : '10') : 0,
-          variants: selectedProduct.variants?.map((v, i) => ({
-            id: `variant-${i}`,
-            name: v,
-            price: parseInt(selectedProduct.price.replace(/[₹,]/g, '')) + (i * 50), // Sample price variation
-            stock: selectedProduct.stockLevel === 'high' ? 100 : selectedProduct.stockLevel === 'medium' ? 50 : 10,
-            image: selectedProduct.image
-          })) || [],
-          images: [
-            { id: '1', url: selectedProduct.image, alt: selectedProduct.name }
-          ],
-          features: [
-            "100% Organic & Chemical-Free",
-            "Farm Fresh Daily Picked",
-            "No Artificial Preservatives",
-            "Rich in Natural Nutrients",
-            "Sustainably Sourced"
-          ],
-          category: "Organics",
-          tags: ["organic", "fresh", "healthy", "natural"],
-          certifications: ["Organic Certified", "Non-GMO", "Fair Trade"]
-        } : null}
-        isOpen={!!selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
+
     </section>
   );
 };
