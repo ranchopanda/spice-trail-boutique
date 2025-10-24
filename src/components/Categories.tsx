@@ -1,5 +1,7 @@
+import { motion } from "framer-motion";
 import { Wheat, Droplet, Leaf, Apple, Coffee, Package } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { ScrollAnimationWrapper, StaggerWrapper } from "@/components/ui/scroll-animation-wrapper";
 
 const categories = [
   {
