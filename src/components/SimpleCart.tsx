@@ -1,265 +1,251 @@
 import { useState, useEffect } from "react";
-import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
-import { Button, useToast } from "@/components/ui/shared";
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  maxStock: number;
-  addedAt: string;
-}
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart, Plus, Minus, Trash2, X, ExternalLink, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/shared/Button";
+import { useCartStore } from "@/stores/cartStore";
+import { useToast } from "@/components/ui/shared";
 
 const SimpleCart = () => {
-  const { success, error } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { items, updateQuantity, removeItem, clearCart, createCheckout, isLoading } = useCartStore();
+  const { success, error: showError } = useToast();
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const loadCart = () => {
-      try {
-        const cart = localStorage.getItem('spice-trail-cart');
-        if (cart) {
-          setCartItems(JSON.parse(cart));
-        }
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-      }
+  const getTotalItems = () => {
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const getTotalPrice = () => {
+    if (items.length === 0) return { amount: '0', currencyCode: 'USD' };
+    const total = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
+    return {
+      amount: total.toFixed(2),
+      currencyCode: items[0].price.currencyCode
     };
+  };
 
-    loadCart();
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
 
-    // Listen for cart updates from other components
-    const handleCartUpdate = () => loadCart();
-    window.addEventListener('cart-updated', handleCartUpdate);
-
-    return () => window.removeEventListener('cart-updated', handleCartUpdate);
-  }, []);
-
-  // Save cart changes to localStorage
-  useEffect(() => {
     try {
-      localStorage.setItem('spice-trail-cart', JSON.stringify(cartItems));
+      await createCheckout();
+      const url = useCartStore.getState().checkoutUrl;
+      if (url) {
+        window.open(url, '_blank');
+        success("Redirecting to Shopify checkout...");
+      }
     } catch (error) {
-      console.error('Failed to save cart:', error);
+      console.error('Checkout failed:', error);
+      showError("Unable to create checkout. Please try again.");
     }
-  }, [cartItems]);
-
-  const getTotalItems = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const getTotalPrice = () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      removeItem(id);
-      return;
-    }
-
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.min(newQuantity, item.maxStock) }
-          : item
-      )
-    );
   };
 
-  const removeItem = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const clearCart = () => {
-    setCartItems([]);
-    localStorage.removeItem('spice-trail-cart');
-    setIsOpen(false);
-  };
-
-  const handleCheckout = () => {
-    // Clear indication that checkout is not implemented yet with proper toast
-    success(
-      "Checkout system integration in progress",
-      <button
-        className="text-blue-600 underline hover:text-blue-800"
-        onClick={() => window.location.href = '/contact'}
-      >
-        Contact us for personalized assistance
-      </button>
-    );
-  };
+  useEffect(() => {
+    const handleCartAddSuccess = () => {
+      setIsOpen(true);
+    };
+    
+    window.addEventListener('cart-add-success', handleCartAddSuccess);
+    return () => window.removeEventListener('cart-add-success', handleCartAddSuccess);
+  }, []);
 
   return (
     <>
-      {/* Floating Cart Trigger */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          className="simple-cart bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-2xl hover:shadow-primary/25 transform hover:scale-110 active:scale-95 transition-all"
-          onClick={() => setIsOpen(true)}
-        >
-          <ShoppingCart className="w-6 h-6" />
-
-          {/* Item count badge */}
-          {getTotalItems() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center min-w-[24px]">
-              {getTotalItems() > 99 ? "99+" : getTotalItems()}
-            </span>
-          )}
-        </button>
-      </div>
+      {/* Floating Cart Button */}
+      <motion.button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl hover:scale-110 transition-transform"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        animate={{
+          scale: getTotalItems() > 0 ? [1, 1.1, 1] : 1,
+        }}
+        transition={{
+          duration: 0.3,
+          repeat: getTotalItems() > 0 ? Infinity : 0,
+          repeatDelay: 2,
+        }}
+      >
+        <ShoppingCart className="w-6 h-6" />
+        {getTotalItems() > 0 && (
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold"
+          >
+            {getTotalItems()}
+          </motion.span>
+        )}
+      </motion.button>
 
       {/* Cart Panel */}
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/50 z-40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+            />
 
-          {/* Cart Panel */}
-          <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 bg-primary text-white">
-              <div className="flex items-center gap-3">
-                <ShoppingCart className="w-6 h-6" />
-                <h2 className="text-xl font-bold">Your Cart</h2>
-                <span className="bg-white/20 text-white px-2 py-1 rounded-full text-sm">
-                  {getTotalItems()} items
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white/20 p-2"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {cartItems.length === 0 ? (
-                <div className="text-center py-12">
-                  <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-                  <p className="text-muted-foreground mb-6">Add some fresh organic products!</p>
-                  <Button
-                    onClick={() => setIsOpen(false)}
-                    className="bg-primary hover:bg-primary/90 text-white"
-                  >
-                    Continue Shopping
-                  </Button>
+            {/* Cart Drawer */}
+            <motion.div
+              className="fixed top-0 right-0 h-full w-full max-w-md bg-background shadow-2xl z-50 flex flex-col"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b bg-card">
+                <div className="flex items-center gap-3">
+                  <ShoppingCart className="w-6 h-6 text-primary" />
+                  <h2 className="text-xl font-bold">Your Cart</h2>
+                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm font-semibold">
+                    {getTotalItems()}
+                  </span>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                      {/* Product Image */}
-                      <div className="w-16 h-16 bg-white rounded-lg flex-shrink-0 overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-muted rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-                      {/* Product Details */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 truncate text-sm">
-                          {item.name}
-                        </h4>
-                        <p className="text-primary font-bold text-lg">₹{item.price}</p>
-
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-
-                          <span className="text-sm font-medium min-w-[2rem] text-center">
-                            {item.quantity}
-                          </span>
-
-                          <Button
-                            variant="outline"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={item.quantity >= item.maxStock}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeItem(item.id)}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {items.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                    <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
+                    <p className="text-lg font-semibold text-muted-foreground">Your cart is empty</p>
+                    <p className="text-sm text-muted-foreground mt-2">Add some products to get started!</p>
+                  </div>
+                ) : (
+                  items.map((item) => {
+                    const productNode = item.product.node;
+                    const firstImage = productNode.images.edges[0]?.node;
+                    
+                    return (
+                      <motion.div
+                        key={item.variantId}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="flex gap-4 bg-card p-4 rounded-xl shadow-sm"
+                      >
+                        {/* Product Image */}
+                        <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden shrink-0">
+                          {firstImage ? (
+                            <img 
+                              src={firstImage.url} 
+                              alt={productNode.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <ShoppingCart className="w-8 h-8 text-muted-foreground/50" />
+                            </div>
+                          )}
                         </div>
 
-                        {/* Stock warning */}
-                        {item.quantity >= item.maxStock - 1 && (
-                          <p className="text-xs text-orange-600 mt-1">
-                            Only {item.maxStock} left in stock
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                        {/* Item Details */}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-semibold text-foreground">{productNode.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {item.price.currencyCode} {parseFloat(item.price.amount).toFixed(2)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => removeItem(item.variantId)}
+                              className="text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
 
-            {/* Footer */}
-            {cartItems.length > 0 && (
-              <div className="border-t bg-gray-50 p-6 space-y-4">
-                {/* Subtotal */}
-                <div className="flex justify-between items-center text-lg font-semibold">
-                  <span>Total: ₹{getTotalPrice().toLocaleString()}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ({getTotalItems()} items)
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              Subtotal: {item.price.currencyCode} {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Cart Summary */}
+              <div className="border-t border-border p-6 space-y-4 bg-muted/30">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Items:</span>
+                  <span className="font-semibold">{getTotalItems()}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total:</span>
+                  <span className="text-primary">
+                    {getTotalPrice().currencyCode} {getTotalPrice().amount}
                   </span>
                 </div>
 
-                {/* Note about payment coming soon */}
-                <div className="bg-yellow-50 text-yellow-800 px-3 py-2 rounded-lg text-sm">
-                  ⚠️ Real Stripe payment integration coming soon
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Button
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3"
                     onClick={handleCheckout}
+                    className="w-full"
+                    size="lg"
+                    disabled={items.length === 0 || isLoading}
                   >
-                    Pay Now • ₹{getTotalPrice().toLocaleString()}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating Checkout...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Checkout with Shopify
+                      </>
+                    )}
                   </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={clearCart}
-                  >
-                    Clear Cart
-                  </Button>
+                  {items.length > 0 && (
+                    <Button
+                      onClick={clearCart}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Clear Cart
+                    </Button>
+                  )}
                 </div>
-
-                {/* Help text */}
-                <p className="text-xs text-center text-muted-foreground">
-                  Secure checkout • Free delivery on ₹500+ • 30-day returns
-                </p>
               </div>
-            )}
-          </div>
-        </>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };
