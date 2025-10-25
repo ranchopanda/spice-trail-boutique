@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, Eye, Star, Shield, Truck } from "lucide-react";
+import { ShoppingCart, Heart, Eye, Star, Shield, Truck, Users, Clock, Zap } from "lucide-react";
+import confetti from "canvas-confetti";
 
 // Simplified components without external dependencies
 const Badge = ({ children, className = "", variant }: {
@@ -50,13 +51,21 @@ interface Product {
   maxStock: number;
   variants?: string[];
   category?: string;
+  // Enhanced premium features
+  viewingCount: number; // Real-time viewers
+  recentlySold: number; // "5 sold today"
+  freshness: 'harvested-today' | 'picked-yesterday' | 'fresh';
+  farmOrigin: string; // "From Rajasthan Farms"
+  certifications: string[]; // ["Organic", "Non-GMO", "Fair Trade"]
+  urgencyLevel: 'low' | 'medium' | 'high' | 'critical'; // For urgency indicators
 }
 
 // Simplified modal component with rich details
-const RichProductModal = ({ product, isOpen, onClose }: {
+const RichProductModal = ({ product, isOpen, onClose, onAddToCart }: {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }) => {
   const [quantity, setQuantity] = useState(1);
 
@@ -187,7 +196,7 @@ const RichProductModal = ({ product, isOpen, onClose }: {
             <div className="flex gap-3">
               <Button
                 onClick={() => {
-                  alert(`🚀 Added ${quantity}x ${product.name} to cart!\n💰 Total: ₹${total.toLocaleString()}\n\n🌱 Fresh organic delivery coming your way!`);
+                  onAddToCart(product, quantity);
                   onClose();
                 }}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 font-semibold text-lg"
@@ -367,7 +376,7 @@ const RichProductModal = ({ product, isOpen, onClose }: {
   );
 };
 
-// Simplified product data
+// Enhanced product data with premium features and realistic images
 const products: Product[] = [
   {
     id: 1,
@@ -375,7 +384,7 @@ const products: Product[] = [
     description: "Fresh farm-picked seasonal vegetables with maximum nutrients",
     price: "₹299",
     originalPrice: "₹399",
-    image: "/assets/products-vegetables.jpg",
+    image: "https://images.unsplash.com/photo-1567306301408-9b74779a11af?w=500&h=500&fit=crop&crop=center",
     badge: "Bestseller",
     discount: "25% OFF",
     rating: 4.9,
@@ -384,7 +393,13 @@ const products: Product[] = [
     stockLevel: 'high',
     maxStock: 25,
     category: "Vegetables",
-    variants: ["1kg", "2kg", "5kg"]
+    variants: ["1kg", "2kg", "5kg"],
+    viewingCount: 23,
+    recentlySold: 12,
+    freshness: 'harvested-today',
+    farmOrigin: "From Punjab Farms",
+    certifications: ["Organic", "Non-GMO", "Fair Trade"],
+    urgencyLevel: 'medium'
   },
   {
     id: 2,
@@ -392,7 +407,7 @@ const products: Product[] = [
     description: "Long-grain organic rice and traditional grains",
     price: "₹449",
     originalPrice: "₹599",
-    image: "/assets/products-grains.jpg",
+    image: "https://images.unsplash.com/photo-1536304993881-ff5825172115?w=500&h=500&fit=crop&crop=center",
     badge: "Popular",
     discount: "25% OFF",
     rating: 4.8,
@@ -400,7 +415,13 @@ const products: Product[] = [
     inStock: true,
     stockLevel: 'medium',
     maxStock: 15,
-    category: "Grains"
+    category: "Grains",
+    viewingCount: 18,
+    recentlySold: 8,
+    freshness: 'picked-yesterday',
+    farmOrigin: "From Haryana Farms",
+    certifications: ["Organic", "Sustainable"],
+    urgencyLevel: 'high'
   },
   {
     id: 3,
@@ -408,7 +429,7 @@ const products: Product[] = [
     description: "Hand-ground traditional spices blend",
     price: "₹349",
     originalPrice: "₹449",
-    image: "/assets/products-spices.jpg",
+    image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=500&h=500&fit=crop&crop=center",
     badge: "New",
     discount: "20% OFF",
     rating: 4.9,
@@ -416,7 +437,13 @@ const products: Product[] = [
     inStock: false,
     stockLevel: 'low',
     maxStock: 8,
-    category: "Spices"
+    category: "Spices",
+    viewingCount: 5,
+    recentlySold: 3,
+    freshness: 'fresh',
+    farmOrigin: "From Rajasthan Farms",
+    certifications: ["Organic", "Non-GMO"],
+    urgencyLevel: 'critical'
   },
   {
     id: 4,
@@ -424,7 +451,7 @@ const products: Product[] = [
     description: "Pesticide-free aromatic herbs for cooking",
     price: "₹199",
     originalPrice: "₹249",
-    image: "/assets/products-vegetables.jpg",
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=500&fit=crop&crop=center",
     badge: "Fresh",
     discount: "20% OFF",
     rating: 4.6,
@@ -432,12 +459,136 @@ const products: Product[] = [
     inStock: true,
     stockLevel: 'high',
     maxStock: 20,
-    category: "Herbs"
+    category: "Herbs",
+    viewingCount: 15,
+    recentlySold: 6,
+    freshness: 'harvested-today',
+    farmOrigin: "From UP Farms",
+    certifications: ["Organic", "Pesticide-Free"],
+    urgencyLevel: 'low'
+  },
+  {
+    id: 5,
+    name: "Organic Fruits Basket",
+    description: "Seasonal fresh fruits picked at peak ripeness",
+    price: "₹599",
+    originalPrice: "₹799",
+    image: "https://images.unsplash.com/photo-1560806887-1e4cd0b2716e?w=500&h=500&fit=crop&crop=center",
+    badge: "Premium",
+    discount: "25% OFF",
+    rating: 4.8,
+    reviewCount: 95,
+    inStock: true,
+    stockLevel: 'medium',
+    maxStock: 12,
+    category: "Fruits",
+    viewingCount: 31,
+    recentlySold: 15,
+    freshness: 'harvested-today',
+    farmOrigin: "From Maharashtra Orchards",
+    certifications: ["Organic", "Non-GMO", "Fair Trade"],
+    urgencyLevel: 'high'
+  },
+  {
+    id: 6,
+    name: "Cold-Pressed Oils",
+    description: "Pure, unrefined oils from organic seeds and nuts",
+    price: "₹799",
+    originalPrice: "₹999",
+    image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&h=500&fit=crop&crop=center",
+    badge: "Healthy",
+    discount: "20% OFF",
+    rating: 4.7,
+    reviewCount: 73,
+    inStock: true,
+    stockLevel: 'low',
+    maxStock: 8,
+    category: "Oils",
+    viewingCount: 12,
+    recentlySold: 4,
+    freshness: 'fresh',
+    farmOrigin: "From Gujarat Farms",
+    certifications: ["Organic", "Cold-Pressed"],
+    urgencyLevel: 'medium'
   }
 ];
 
 const ProductGrid = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // 🎉 Million-Dollar Confetti Celebration for Product Addition
+  const triggerAddToCartConfetti = () => {
+    const duration = 2000;
+    const animationEnd = Date.now() + duration;
+
+    const randomInRange = (min: number, max: number) => {
+      return Math.random() * (max - min) + min;
+    };
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      const particleCount = 30 * (timeLeft / duration);
+
+      // Center burst - more focused for product addition
+      confetti({
+        particleCount,
+        startVelocity: randomInRange(30, 60),
+        spread: randomInRange(60, 80),
+        origin: {
+          x: 0.5,
+          y: randomInRange(0.3, 0.6)
+        },
+        colors: ['#6B8E23', '#FF9933', '#FFD700', '#228B22', '#DAA520'],
+        shapes: ['circle', 'square'],
+        gravity: randomInRange(0.6, 1.0),
+        ticks: randomInRange(80, 150),
+      });
+    }, 150);
+  };
+
+  // Add item to cart and trigger confetti
+  const addToCart = (product: Product, quantity: number = 1) => {
+    try {
+      const cart = JSON.parse(localStorage.getItem('spice-trail-cart') || '[]');
+      const existingItem = cart.find((item: any) => item.id === product.id);
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+        existingItem.quantity = Math.min(existingItem.quantity, product.maxStock);
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: parseInt(product.price.replace(/[₹,]/g, '')),
+          image: product.image,
+          quantity: quantity,
+          maxStock: product.maxStock,
+          addedAt: new Date().toISOString()
+        });
+      }
+
+      localStorage.setItem('spice-trail-cart', JSON.stringify(cart));
+
+      // Trigger cart update event for other components
+      window.dispatchEvent(new Event('cart-updated'));
+
+      // 🎉 Trigger confetti celebration
+      triggerAddToCartConfetti();
+
+      // Show success message
+      alert(`🎉 ${product.name} added to cart successfully!\n✨ Check out the celebration!`);
+
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      alert('Failed to add item to cart. Please try again.');
+    }
+  };
 
   return (
     <>
@@ -455,7 +606,7 @@ const ProductGrid = () => {
           </div>
 
           {/* Professional Product Grid with Advanced Animations */}
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {products.map((product, index) => (
               <motion.div
                 key={product.id}
@@ -575,6 +726,89 @@ const ProductGrid = () => {
                         {product.inStock ? '✓ Available' : '✗ Unavailable'}
                       </Badge>
                     </motion.div>
+
+                    {/* Urgency Indicators */}
+                    {product.inStock && product.urgencyLevel !== 'low' && (
+                      <motion.div
+                        className="absolute bottom-3 left-3 right-3"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: 0.9 + index * 0.1,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                      >
+                        <div className={`text-center py-2 px-3 rounded-lg text-xs font-bold ${
+                          product.urgencyLevel === 'critical'
+                            ? 'bg-gradient-to-r from-red-500 to-red-600 text-white animate-pulse'
+                            : product.urgencyLevel === 'high'
+                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+                            : 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-yellow-900'
+                        }`}>
+                          {product.urgencyLevel === 'critical' && '🔥 ONLY 3 LEFT!'}
+                          {product.urgencyLevel === 'high' && '⚡ HIGH DEMAND'}
+                          {product.urgencyLevel === 'medium' && '📈 POPULAR ITEM'}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Real-time Activity Indicators */}
+                    {product.inStock && product.viewingCount > 10 && (
+                      <motion.div
+                        className="absolute bottom-3 right-3"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          delay: 1.1 + index * 0.1,
+                          type: "spring",
+                          stiffness: 300
+                        }}
+                      >
+                        <div className="bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          <span>{product.viewingCount} viewing</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Freshness Badge */}
+                    {product.freshness === 'harvested-today' && (
+                      <motion.div
+                        className="absolute top-16 left-3"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          delay: 1.3 + index * 0.1,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                      >
+                        <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-bold">
+                          <Zap className="w-3 h-3" />
+                          <span>Harvested Today</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Recently Sold Counter */}
+                    {product.recentlySold > 5 && (
+                      <motion.div
+                        className="absolute top-16 right-3"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          delay: 1.5 + index * 0.1,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                      >
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-bold">
+                          <Clock className="w-3 h-3" />
+                          <span>{product.recentlySold} sold today</span>
+                        </div>
+                      </motion.div>
+                    )}
 
                     {/* Professional Hover Effects */}
                     <motion.div
@@ -767,7 +1001,7 @@ const ProductGrid = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (product.inStock) {
-                              alert(`🎉 ${product.name} added to cart successfully!`);
+                              addToCart(product, 1);
                             }
                           }}
                         >
@@ -833,6 +1067,7 @@ const ProductGrid = () => {
           product={selectedProduct}
           isOpen={!!selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          onAddToCart={addToCart}
         />
       </section>
     </>

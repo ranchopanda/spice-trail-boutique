@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 import { Button, useToast } from "@/components/ui/shared";
+import confetti from "canvas-confetti";
 
 interface CartItem {
   id: number;
@@ -51,6 +52,57 @@ const SimpleCart = () => {
   const getTotalItems = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const getTotalPrice = () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  // 🎉 Million-Dollar Confetti Celebration
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+
+    const randomInRange = (min: number, max: number) => {
+      return Math.random() * (max - min) + min;
+    };
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      // Left side burst
+      confetti({
+        particleCount,
+        startVelocity: randomInRange(50, 100),
+        spread: randomInRange(50, 70),
+        origin: {
+          x: randomInRange(0.1, 0.3),
+          y: Math.random() - 0.2
+        },
+        colors: ['#6B8E23', '#FF9933', '#FFD700', '#228B22', '#DAA520'],
+        shapes: ['circle', 'square'],
+        gravity: randomInRange(0.8, 1.2),
+        ticks: randomInRange(100, 200),
+      });
+
+      // Right side burst
+      confetti({
+        particleCount,
+        startVelocity: randomInRange(50, 100),
+        spread: randomInRange(50, 70),
+        origin: {
+          x: randomInRange(0.7, 0.9),
+          y: Math.random() - 0.2
+        },
+        colors: ['#6B8E23', '#FF9933', '#FFD700', '#228B22', '#DAA520'],
+        shapes: ['circle', 'square'],
+        gravity: randomInRange(0.8, 1.2),
+        ticks: randomInRange(100, 200),
+      });
+    }, 250);
+  };
+
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeItem(id);
@@ -95,7 +147,13 @@ const SimpleCart = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           className="simple-cart bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-2xl hover:shadow-primary/25 transform hover:scale-110 active:scale-95 transition-all"
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setIsOpen(true);
+            // 🎉 Trigger confetti when opening cart with items
+            if (getTotalItems() > 0) {
+              setTimeout(() => triggerConfetti(), 300);
+            }
+          }}
         >
           <ShoppingCart className="w-6 h-6" />
 

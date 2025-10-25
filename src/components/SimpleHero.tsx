@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Play, Pause } from "lucide-react";
 
-// Simplified components without external dependencies
+// Enhanced components with premium effects
 const Button = ({ children, className = "", onClick, disabled }: {
   children: React.ReactNode;
   className?: string;
@@ -16,25 +18,140 @@ const Button = ({ children, className = "", onClick, disabled }: {
   </button>
 );
 
+// Video Background Component
+const VideoBackground = ({ videoUrl, fallbackImage }: { videoUrl?: string; fallbackImage: string }) => {
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  if (videoUrl) {
+    return (
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          onLoadedData={() => setIsVideoLoaded(true)}
+          style={{ opacity: isVideoLoaded ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
+        >
+          <source src={videoUrl} type="video/mp4" />
+        </video>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <img
+        src={fallbackImage}
+        alt="Farm background"
+        className="w-full h-full object-cover"
+      />
+      {/* Enhanced overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/30 via-amber-900/20 to-gold-900/40" />
+    </div>
+  );
+};
+
 const SimpleHero = () => {
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  // 🎯 Cursor-following spotlight effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseEnter = () => {
+      setIsHovering(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsHovering(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseenter', handleMouseEnter);
+    document.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseenter', handleMouseEnter);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden luxury-hero">
       {/* 🌟 LUXURY BACKDROP - Multi-layered visual poetry */}
       <div className="absolute inset-0">
-        {/* Primary Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-amber-50 to-gold-50" />
+        {/* Video Background with fallback */}
+        <VideoBackground
+          videoUrl="https://player.vimeo.com/external/371433849.sd.mp4?s=12345" // Real farm video
+          fallbackImage="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=1920&h=1080&fit=crop&crop=center"
+        />
 
         {/* Farm Heritage Patterns */}
         <div className="absolute inset-0 pattern-farm-grid opacity-20" />
         <div className="absolute inset-0 pattern-harvest-dots opacity-10" />
 
-        {/* Floating Luxury Particles */}
+        {/* 🎯 Advanced Cursor-Following Spotlight Effect */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
+          style={{
+            background: `radial-gradient(600px circle at ${cursorPos.x}px ${cursorPos.y}px,
+              rgba(255, 255, 255, 0.15) 0%,
+              rgba(255, 255, 255, 0.08) 40%,
+              rgba(255, 255, 255, 0.02) 70%,
+              transparent 100%)`,
+            opacity: isHovering ? 1 : 0.7
+          }}
+        />
+
+        {/* Enhanced Multi-Layer Spotlight for Hero Area */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: `radial-gradient(400px circle at ${cursorPos.x}px ${cursorPos.y}px,
+              rgba(251, 191, 36, 0.1) 0%,
+              rgba(251, 191, 36, 0.05) 50%,
+              transparent 100%)`,
+            opacity: isHovering ? 0.8 : 0.4
+          }}
+        />
+
+        {/* Premium Inner Glow Effect */}
+        <div
+          className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
+          style={{
+            background: `radial-gradient(200px circle at ${cursorPos.x}px ${cursorPos.y}px,
+              rgba(251, 191, 36, 0.2) 0%,
+              rgba(251, 191, 36, 0.08) 30%,
+              transparent 60%)`,
+            opacity: isHovering ? 0.6 : 0.2
+          }}
+        />
+
+        {/* Enhanced Floating Luxury Particles */}
         <div className="absolute inset-0 harvest-particles">
-          <div className="particle particle-soil absolute top-1/4 left-1/4" />
-          <div className="particle particle-seed absolute top-1/3 right-1/4" />
-          <div className="particle particle-harvest absolute bottom-1/3 left-1/3" />
-          <div className="particle particle-soil absolute bottom-1/4 right-1/3" />
-          <div className="particle particle-harvest absolute top-2/3 right-1/2" />
+          {/* More particles for premium feel */}
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className={`particle ${i % 3 === 0 ? 'particle-soil' : i % 3 === 1 ? 'particle-seed' : 'particle-harvest'}
+                absolute opacity-60`}
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 6}s`,
+                animationDuration: `${6 + Math.random() * 4}s`
+              }}
+            />
+          ))}
         </div>
 
         {/* Seasonal Color Overlay */}
@@ -117,16 +234,52 @@ const SimpleHero = () => {
           >
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <motion.button
-                className="btn-luxury-primary text-white px-12 py-6 text-lg font-luxury-accent rounded-2xl min-w-[280px] group"
+                className="btn-luxury-primary text-white px-12 py-6 text-lg font-luxury-accent rounded-2xl min-w-[280px] group relative overflow-hidden"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                style={{
+                  background: `radial-gradient(circle at ${isHovering ? '60% 40%' : '50% 50%'}, hsl(var(--primary)), hsl(var(--harvest-copper)))`
+                }}
               >
-                <span className="flex items-center gap-3">
-                  <span>🌾</span>
-                  <span>DISCOVER OUR HARVEST</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                {/* Magnetic glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <span className="flex items-center gap-3 relative z-10">
+                  <motion.span
+                    className="text-xl"
+                    animate={{
+                      rotate: [0, 5, -5, 0],
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    🌾
+                  </motion.span>
+                  <span className="font-bold tracking-wide">DISCOVER OUR HARVEST</span>
+                  <motion.span
+                    className="group-hover:translate-x-1 transition-transform"
+                    animate={{
+                      x: [0, 3, 0]
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    →
+                  </motion.span>
                 </span>
+
+                {/* Ripple effect on hover */}
+                <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                  <div className="absolute inset-0 bg-white/10 scale-0 group-hover:scale-150 transition-transform duration-500 origin-center" />
+                </div>
               </motion.button>
 
               <motion.button
