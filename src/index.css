@@ -17,24 +17,46 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 95 45% 15%;
 
-    /* 🎨 REVOLUTIONIZED COLORS - More vibrant, appetizing, premium */
-    --primary: 95 60% 20%;        /* Deeper, richer organic green */
-    --primary-foreground: 42 45% 96%;
+    /* 🎨 MILLION DOLLAR AGRICULTURE LUXURY PALETTE */
+    --luxury-gold: 45 85% 55%;       /* 24k gold for premium feel */
+    --luxury-ivory: 45 25% 95%;      /* Pure luxury cream */
+    --luxury-sage: 95 15% 45%;       /* Sophisticated green */
+    --luxury-terra: 25 45% 35%;      /* Rich earth brown */
 
-    --secondary: 14 90% 58%;      /* Much more vibrant terracotta/orange */
+    --primary: 25 75% 30%;         /* Luxury forest green - premium, sophisticated */
+    --primary-foreground: 45 25% 98%;
+
+    --secondary: 24 85% 50%;       /* Harvest sunset orange - warm, inviting */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 42 35% 88%;
-    --muted-foreground: 95 25% 45%;
+    --accent: 45 70% 85%;          /* Morning sunlight yellow - fresh, energizing */
+    --accent-foreground: 25 45% 25%;
 
-    --accent: 42 95% 85%;         /* Brighter, sunnier cream/yellow */
-    --accent-foreground: 95 45% 25%;
+    /* 🌟 PREMIUM AGRICULTURE COLOR SYSTEM */
+    --harvest-copper: 20 80% 45%;    /* Antique bronze */
+    --organic-emerald: 142 65% 28%;  /* Deep precious emerald */
+    --earth-chocolate: 25 60% 25%;   /* Rich cocoa brown */
+    --sunrise-amber: 35 90% 60%;     /* Golden amber */
 
-    /* 🌱 NEW HARVEST COLORS - Fresh and appetizing */
-    --success: 142 76% 36%;       /* Fresh veggie green */
-    --organic-gold: 45 100% 51%;  /* Sunshine yellow */
-    --earth-brown: 25 75% 35%;    /* Rich soil brown */
-    --harvest-orange: 24 100% 50%; /* Pumpkin orange */
+    --muted: 45 20% 90%;            /* Pearl ivory */
+    --muted-foreground: 25 35% 35%;
+
+    --success: 142 70% 32%;         /* Forest success green */
+    --info: 195 80% 45%;            /* Sky information blue */
+    --warning: 38 90% 55%;          /* Autumn harvest gold */
+    --destructive: 0 75% 55%;       /* Burgundy error */
+
+    /* 🌱 FARM AUTHENTICITY COLORS */
+    --seedling-green: 95 60% 45%;    /* Fresh seedling */
+    --harvest-gold: 45 100% 51%;    /* Premium harvest gold */
+    --soil-brown: 25 75% 35%;       /* Rich farm soil */
+    --bounty-orange: 24 100% 50%;   /* Abundant harvest */
+
+    /* ⭐ LUXURY METALLIC ACCENTS */
+    --platinum-silver: 210 20% 85%;  /* Premium silver */
+    --antique-bronze: 20 60% 45%;    /* Heritage bronze */
+    --rose-gold: 15 55% 75%;         /* Elegant rose */
+    --champagne-gold: 45 65% 75%;    /* Bubbly gold */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
@@ -456,5 +478,376 @@ All colors MUST be HSL.
     animation: shimmer-wave 1.5s infinite ease-in-out;
   }
 
+  /* 🌟 MILLION DOLLAR LUXURY ANIMATIONS & EFFECTS */
+
+  /* Premium Parallax Scrolling */
+  @keyframes luxury-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(-5px) rotate(-0.5deg); }
+  }
+
+  @keyframes golden-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--luxury-gold) / 0.4); }
+    50% { box-shadow: 0 0 40px hsl(var(--luxury-gold) / 0.7), 0 0 60px hsl(var(--luxury-gold) / 0.3); }
+  }
+
+  /* Luxury Typography Effects */
+  .font-luxury-display {
+    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .font-luxury-body {
+    font-family: 'Source Serif Pro', 'Georgia', serif;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .font-luxury-accent {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Farm Heritage Badges */
+  .luxury-badge-farm {
+    background: linear-gradient(135deg, hsl(var(--antique-bronze)), hsl(var(--champagne-gold)));
+    box-shadow: 0 4px 12px hsl(var(--antique-bronze) / 0.3);
+    border: 1px solid hsl(var(--luxury-gold));
+  }
+
+  .luxury-badge-organic {
+    background: linear-gradient(135deg, hsl(var(--organic-emerald)), hsl(var(--seedling-green)));
+    box-shadow: 0 4px 12px hsl(var(--organic-emerald) / 0.3);
+  }
+
+  .luxury-badge-seasonal {
+    background: linear-gradient(135deg, hsl(var(--bounty-orange)), hsl(var(--sunrise-amber)));
+    box-shadow: 0 4px 12px hsl(var(--bounty-orange) / 0.3);
+  }
+
+  /* Premium Card Hover Effects */
+  .card-luxury-hover {
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+  }
+
+  .card-luxury-hover:hover {
+    transform: translateY(-16px) scale(1.03) rotateX(5deg) rotateY(-3deg);
+    box-shadow:
+      0 20px 40px hsl(var(--luxury-terra) / 0.2),
+      0 0 0 1px hsl(var(--luxury-gold) / 0.1),
+      inset 0 1px 0 hsl(var(--luxury-ivory) / 0.5);
+  }
+
+  /* Golden Text Effect */
+  .text-luxury-gold {
+    background: linear-gradient(135deg, hsl(var(--antique-bronze)), hsl(var(--champagne-gold)), hsl(var(--rose-gold)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px hsl(var(--luxury-gold) / 0.3));
+  }
+
+  /* Organic Particle Effects */
+  .particle-soil {
+    background: linear-gradient(45deg, hsl(var(--earth-chocolate)), hsl(var(--soil-brown)));
+    animation: particle-float 8s ease-in-out infinite;
+  }
+
+  .particle-seed {
+    background: linear-gradient(45deg, hsl(var(--seedling-green)), hsl(var(--organic-emerald)));
+    animation: particle-float 10s ease-in-out infinite reverse;
+  }
+
+  .particle-harvest {
+    background: linear-gradient(45deg, hsl(var(--sunrise-amber)), hsl(var(--harvest-gold)));
+    animation: particle-float 12s ease-in-out infinite;
+  }
+
+  @keyframes particle-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 0.6; }
+    25% { transform: translateY(-20px) rotate(90deg) scale(1.1); opacity: 0.8; }
+    50% { transform: translateY(-15px) rotate(180deg) scale(0.9); opacity: 0.4; }
+    75% { transform: translateY(-25px) rotate(270deg) scale(1.2); opacity: 0.9; }
+  }
+
+  /* Luxury Button Effects */
+  .btn-luxury-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--harvest-copper)));
+    box-shadow:
+      0 4px 15px hsl(var(--primary) / 0.4),
+      0 2px 4px hsl(var(--harvest-copper) / 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-luxury-primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 25px hsl(var(--primary) / 0.5),
+      0 4px 6px hsl(var(--harvest-copper) / 0.3);
+  }
+
+  /* Heritage Farm Patterns */
+  .pattern-farm-grid {
+    background-image:
+      radial-gradient(circle at 1px 1px, hsl(var(--luxury-gold) / 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  .pattern-harvest-dots {
+    background-image: radial-gradient(circle, hsl(var(--harvest-gold)) 2px, transparent 2px);
+    background-size: 30px 30px;
+  }
+
+  /* Seasonal Ribbon Effects */
+  @keyframes ribbon-wave {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-3px) rotate(2deg); }
+    75% { transform: translateY(2px) rotate(-1deg); }
+  }
+
+  .ribbon-seasonal {
+    background: linear-gradient(45deg, hsl(var(--luxury-gold)), hsl(var(--champagne-gold)));
+    animation: ribbon-wave 8s ease-in-out infinite;
+  }
+
+  /* Cart Animation Sequence */
+  @keyframes cart-bounce {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.2) rotate(-5deg); }
+    50% { transform: scale(1.3) rotate(5deg); }
+    75% { transform: scale(1.1) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .cart-success {
+    animation: cart-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Trust Badge Stack */
+  .trust-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .trust-badge {
+    background: linear-gradient(135deg, hsl(var(--luxury-ivory)), white);
+    border: 1px solid hsl(var(--luxury-gold) / 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px hsl(var(--luxury-terra) / 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .trust-badge:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px hsl(var(--luxury-terra) / 0.15);
+    border-color: hsl(var(--luxury-gold) / 0.5);
+  }
+
+  /* Producer Story Card */
+  .producer-card {
+    background: linear-gradient(135deg, hsl(var(--luxury-ivory)), hsl(var(--luxury-gold) / 0.05));
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px hsl(var(--luxury-terra) / 0.1);
+    border: 1px solid hsl(var(--luxury-gold) / 0.2);
+  }
+
+  .producer-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 50px hsl(var(--luxury-terra) / 0.2);
+  }
+
+  /* Seasonal Overlay Effects */
+  .season-overlay-summer {
+    background: linear-gradient(135deg, hsl(var(--sunrise-amber) / 0.1), hsl(var(--harvest-gold) / 0.1));
+  }
+
+  .season-overlay-autumn {
+    background: linear-gradient(135deg, hsl(var(--bounty-orange) / 0.1), hsl(var(--harvest-copper) / 0.1));
+  }
+
+  .season-overlay-winter {
+    background: linear-gradient(135deg, hsl(var(--luxury-ivory) / 0.1), hsl(var(--platinum-silver) / 0.1));
+  }
+
+  /* Quality Meter */
+  .quality-meter {
+    background: linear-gradient(90deg,
+      hsl(var(--organic-emerald)) 0%,
+      hsl(var(--seedling-green)) 25%,
+      hsl(var(--sunrise-amber)) 50%,
+      hsl(var(--harvest-gold)) 75%,
+      hsl(var(--luxury-gold)) 100%
+    );
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quality-meter::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,255,255,0.3) 50%,
+      transparent 100%
+    );
+    animation: shimmer-wave 3s ease-in-out infinite;
+  }
+
+  /* Certificate Showcase */
+  .certificate-glow {
+    box-shadow:
+      0 0 20px hsl(var(--antique-bronze) / 0.3),
+      0 0 40px hsl(var(--champagne-gold) / 0.2),
+      inset 0 1px 0 hsl(var(--luxury-ivory));
+    border: 1px solid hsl(var(--luxury-gold));
+  }
+
+  /* Harvest Countdown Timer */
+  @keyframes countdown-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+
+  .countdown-timer {
+    animation: countdown-pulse 2s ease-in-out infinite;
+    background: linear-gradient(45deg, hsl(var(--bounty-orange)), hsl(var(--harvest-gold)));
+    color: white;
+  }
+
+  /* Membership Crown Effect */
+  .membership-crown {
+    background: linear-gradient(135deg, hsl(var(--antique-bronze)), hsl(var(--luxury-gold)), hsl(var(--champagne-gold)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: golden-glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Product Storytelling */
+  .story-backdrop {
+    background: linear-gradient(135deg,
+      hsl(var(--soil-brown) / 0.1),
+      hsl(var(--luxury-terra) / 0.1),
+      hsl(var(--luxury-sage) / 0.1)
+    );
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-backdrop::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, hsl(var(--seedling-green) / 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, hsl(var(--harvest-gold) / 0.2) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Premium Badge Collection */
+  .badges-premium {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .badge-superior {
+    background: linear-gradient(135deg, hsl(var(--luxury-gold)), hsl(var(--champagne-gold)));
+    color: hsl(var(--luxury-terra));
+    font-weight: 700;
+    text-shadow: 0 1px 2px hsl(var(--luxury-gold) / 0.3);
+  }
+
+  .badge-heritage {
+    background: linear-gradient(135deg, hsl(var(--antique-bronze)), hsl(var(--earth-chocolate)));
+    color: hsl(var(--luxury-ivory));
+  }
+
+  .badge-biodynamic {
+    background: linear-gradient(135deg, hsl(var(--organic-emerald)), hsl(var(--seedling-green)));
+    color: white;
+  }
+
+  /* Farm Gallery Grid */
+  .gallery-farm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .gallery-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px hsl(var(--luxury-terra) / 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .gallery-item:hover {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 0 16px 40px hsl(var(--luxury-terra) / 0.25);
+  }
+
+  /* Subscription Tier Styling */
+  .tier-platinum {
+    background: linear-gradient(135deg, hsl(var(--platinum-silver)), hsl(var(--luxury-ivory)));
+    border: 2px solid hsl(var(--antique-bronze));
+  }
+
+  .tier-gold {
+    background: linear-gradient(135deg, hsl(var(--luxury-gold)), hsl(var(--sunrise-amber)));
+    border: 2px solid hsl(var(--rose-gold));
+  }
+
+  .tier-silver {
+    background: linear-gradient(135deg, hsl(var(--platinum-silver)), hsl(var(--luxury-sage)));
+    border: 2px solid hsl(var(--antique-bronze));
+  }
+
+  /* Luxury Scroll Indicator */
+  .scroll-luxury {
+    background: linear-gradient(135deg, hsl(var(--luxury-gold)), hsl(var(--champagne-gold)));
+    box-shadow: 0 4px 12px hsl(var(--luxury-gold) / 0.3);
+    animation: luxury-float 4s ease-in-out infinite;
+  }
+
+  /* Final Prestige Effect */
+  .prestige-border {
+    position: relative;
+    background: linear-gradient(45deg, hsl(var(--luxury-gold)), hsl(var(--champagne-gold)), hsl(var(--rose-gold)));
+    padding: 2px;
+    border-radius: 16px;
+  }
+
+  .prestige-border::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: linear-gradient(135deg, hsl(var(--luxury-ivory)), white);
+    border-radius: inherit;
+    z-index: 1;
+  }
+
+  .prestige-content {
+    position: relative;
+    z-index: 2;
+  }
 
 }

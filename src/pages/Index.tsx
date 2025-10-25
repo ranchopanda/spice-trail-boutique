@@ -1,26 +1,3 @@
-<<<<<<< HEAD
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import Categories from "@/components/Categories";
-
-import ProductGrid from "@/components/ProductGrid";
-import VideoShowcase from "@/components/VideoShowcase";
-import TestimonialsCarousel from "@/components/TestimonialsCarousel";
-import Mission from "@/components/Mission";
-import Footer from "@/components/Footer";
-
-const Index = () => {
-  return (
-    <div className="min-h-screen">
-      <Header />
-      <main>
-        <Hero />
-        <Categories />
-        <ProductGrid />
-        <VideoShowcase />
-        <TestimonialsCarousel />
-        <Mission />
-=======
 // Consolidated minimal e-commerce homepage
 // Phase 1: Combined 15+ components into 4 essential ones
 
@@ -51,7 +28,6 @@ const Index = () => {
       <main className="relative">
         <SimpleHero />
         <ProductGrid />
->>>>>>> 64ec72ad9603722865dfbfda730134f437d6537e
       </main>
 
       {/* CLEAN FOOTER */}
