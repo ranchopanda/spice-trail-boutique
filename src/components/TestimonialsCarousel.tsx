@@ -1,11 +1,11 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/shared";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@/components/ui/shared";
 import { Star } from "lucide-react";
 
 interface Testimonial {

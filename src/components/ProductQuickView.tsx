@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/shared";
+import { Button } from "@/components/ui/shared";
+import { Badge } from "@/components/ui/shared";
 import { ShoppingCart, Heart, Star, Minus, Plus } from "lucide-react";
 
 interface ProductQuickViewProps {

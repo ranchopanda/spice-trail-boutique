@@ -2,8 +2,8 @@ import { forwardRef } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive";
-  size?: "sm" | "md" | "lg";
-  children: React.ReactNode;
+  size?: "sm" | "md" | "lg" | "icon";
+  children?: React.ReactNode;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -12,6 +12,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sm: "px-3 py-1.5 text-sm",
       md: "px-4 py-2 text-base",
       lg: "px-6 py-3 text-lg",
+      icon: "p-2",
     };
 
     const variantClasses = {

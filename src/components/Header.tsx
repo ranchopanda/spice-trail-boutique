@@ -1,6 +1,6 @@
 import { ShoppingCart, Search, User, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/shared";
+import { Input } from "@/components/ui/shared";
 import { useState } from "react";
 
 const Header = () => {
