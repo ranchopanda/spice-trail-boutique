@@ -16,6 +16,9 @@ export default {
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'handwritten': ['Caveat', 'cursive'],
+        'luxury-display': ['Playfair Display', 'Georgia', 'serif'],
+        'luxury-body': ['Cormorant', 'Georgia', 'serif'],
+        'luxury-accent': ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -494,20 +494,20 @@ All colors MUST be HSL.
 
   /* Luxury Typography Effects */
   .font-luxury-display {
-    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-family: 'Playfair Display', 'Georgia', 'serif';
     font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
 
   .font-luxury-body {
-    font-family: 'Source Serif Pro', 'Georgia', serif;
+    font-family: 'Cormorant', 'Georgia', 'serif';
     font-weight: 400;
     line-height: 1.6;
   }
 
   .font-luxury-accent {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Inter', 'system-ui', 'sans-serif';
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
