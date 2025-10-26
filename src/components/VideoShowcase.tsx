@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share, Eye } from "lucide-react";
 import { Button } from "@/components/ui/shared";
@@ -129,6 +129,16 @@ const VideoShowcase = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [currentShortIndex, setCurrentShortIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const openVideoModal = (video: Video) => {
     setSelectedVideo(video);
@@ -339,7 +349,7 @@ const VideoShowcase = () => {
         </div>
       </section>
 
-      {/* Video Modal */}
+      {/* Responsive Video Modal */}
       <AnimatePresence>
         {selectedVideo && (
           <>
@@ -352,123 +362,235 @@ const VideoShowcase = () => {
               onClick={closeVideoModal}
             />
 
-            {/* Modal */}
+            {/* Modal - Adaptive Layout */}
             <motion.div
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-4xl mx-4"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className={`bg-white shadow-2xl z-50 flex flex-col ${
+                isMobile
+                  ? 'fixed inset-x-0 bottom-0 rounded-t-xl max-h-[95vh]'
+                  : 'fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl max-h-[95vh]'
+              }`}
+              initial={{
+                ...(isMobile
+                  ? { y: "100%" }
+                  : { opacity: 0, scale: 0.9, y: 50 }
+                )
+              }}
+              animate={{
+                ...(isMobile
+                  ? { y: 0 }
+                  : { opacity: 1, scale: 1, y: 0 }
+                )
+              }}
+              exit={{
+                ...(isMobile
+                  ? { y: "100%" }
+                  : { opacity: 0, scale: 0.9, y: 50 }
+                )
+              }}
+              transition={{
+                type: "spring",
+                damping: 30,
+                stiffness: 300,
+                duration: isMobile ? 0.4 : 0.5
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">{selectedVideo.title}</h3>
-                    <p className="text-sm text-gray-600">{selectedVideo.description}</p>
-                  </div>
-                  <button
-                    onClick={closeVideoModal}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <X className="w-5 h-5 text-gray-500" />
-                  </button>
+              {/* Mobile Handle */}
+              {isMobile && (
+                <div className="flex justify-center py-2 pb-4">
+                  <div className="w-12 h-1 bg-muted-foreground/30 rounded-full"></div>
                 </div>
+              )}
 
-                {/* Video Player Area */}
-                <div className="relative bg-black">
-                  {/* YouTube Video Embed */}
-                  <div className={`relative ${
-                    selectedVideo.aspectRatio === '16:9' ? 'aspect-video' : 'aspect-[9/16] max-w-sm mx-auto'
+              {/* Header - Mobile Optimized */}
+              <div className={`flex items-center justify-between border-b bg-card ${
+                isMobile ? 'px-4 py-2' : 'px-6 py-4'
+              }`}>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-bold text-gray-900 line-clamp-1 ${
+                    isMobile ? 'text-base' : 'text-xl'
                   }`}>
+                    {selectedVideo.title}
+                  </h3>
+                  <p className={`text-gray-600 line-clamp-2 ${
+                    isMobile ? 'text-xs leading-tight' : 'text-sm'
+                  }`}>
+                    {selectedVideo.description}
+                  </p>
+                </div>
+                <button
+                  onClick={closeVideoModal}
+                  className={`hover:bg-muted rounded-full transition-colors ml-3 ${
+                    isMobile ? 'p-2' : 'p-2'
+                  }`}
+                  aria-label="Close video"
+                >
+                  <X className={`${
+                    isMobile ? 'w-5 h-5' : 'w-6 h-6'
+                  }`} />
+                </button>
+              </div>
+
+              {/* Video Player Area */}
+              <div className="flex-1 bg-black relative">
+                {/* Loading Skeleton */}
+                {isLoading && (
+                  <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+                    <div className="w-12 h-12 border-4 border-gray-600 border-t-primary rounded-full animate-spin"></div>
+                  </div>
+                )}
+
+                {/* YouTube Video Embed - Responsive Sizing */}
+                <div className={`relative w-full h-full ${
+                  isMobile ? 'max-h-[50vh]' : 'aspect-video'
+                }`}>
+                  {/* For horizontal videos (16:9) */}
+                  {selectedVideo.aspectRatio === '16:9' && (
                     <iframe
-                      src={`${selectedVideo.videoUrl}?autoplay=${isPlaying ? 1 : 0}&mute=${isMuted ? 1 : 0}&controls=1&modestbranding=1&rel=0`}
-                      className="w-full h-full"
+                      src={`${selectedVideo.videoUrl}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3`}
+                      className={`w-full h-full ${isMobile ? 'aspect-video' : ''}`}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      onLoad={() => setIsLoading(false)}
                     />
+                  )}
 
-                    {/* Custom Play/Pause Overlay */}
-                    {!isPlaying && (
-                      <motion.button
-                        onClick={togglePlay}
-                        className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <div className="bg-white/90 backdrop-blur-sm p-4 rounded-full">
-                          <Play className="w-8 h-8 text-gray-800 fill-current" />
-                        </div>
-                      </motion.button>
-                    )}
+                  {/* For vertical videos (9:16) - Shorts */}
+                  {selectedVideo.aspectRatio === '9:16' && (
+                    <div className={`flex items-center justify-center h-full ${
+                      isMobile ? 'h-full' : 'max-h-[80vh]'
+                    }`}>
+                      <iframe
+                        src={`${selectedVideo.videoUrl}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3`}
+                        className={`${
+                          isMobile
+                            ? 'w-full aspect-[9/16] max-w-none'
+                            : 'w-auto max-w-md aspect-[9/16]'
+                        }`}
+                        style={{
+                          maxHeight: isMobile ? '100%' : 'min(80vh, 600px)',
+                        }}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        onLoad={() => setIsLoading(false)}
+                      />
+                    </div>
+                  )}
 
-                    {/* Custom Controls */}
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                  {/* Custom Controls Overlay - Only on Desktop */}
+                  {!isMobile && (
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={toggleMute}
-                          className="bg-white/20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-white/30 transition-colors"
+                          className="bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors"
+                          aria-label={isMuted ? "Unmute video" : "Mute video"}
                         >
-                          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                         </button>
-                        <span className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-sm">
+                        <div className="bg-black/70 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium">
                           {selectedVideo.duration}
-                        </span>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-black/70 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm">
                           {selectedVideo.views} views
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Video Info */}
-                <div className="p-4 border-t">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-4">
-                      <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors">
-                        <Heart className="w-5 h-5" />
-                        <span className="text-sm">{selectedVideo.likes}</span>
-                      </button>
-                      <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors">
-                        <MessageCircle className="w-5 h-5" />
-                        <span className="text-sm">Comments</span>
-                      </button>
-                      <button className="flex items-center gap-2 text-gray-600 hover:text-green-500 transition-colors">
-                        <Share className="w-5 h-5" />
-                        <span className="text-sm">Share</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Navigation for Shorts */}
-                  {selectedVideo.aspectRatio === '9:16' && (
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={prevShort}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <ChevronLeft className="w-5 h-5 text-gray-600" />
-                      </button>
-
-                      <span className="text-sm text-gray-600">
-                        {currentShortIndex + 1} of {videoShorts.length}
-                      </span>
-
-                      <button
-                        onClick={nextShort}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5 text-gray-600" />
-                      </button>
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Video Info & Actions - Bottom */}
+              <div className={`border-t border-border ${
+                isMobile ? 'p-4 space-y-3' : 'p-6'
+              }`}>
+                {/* Interaction Buttons */}
+                <div className="flex items-center justify-between">
+                  <div className={`flex items-center gap-3 ${
+                    isMobile ? 'gap-4' : 'gap-6'
+                  }`}>
+                    <button className={`flex items-center gap-2 hover:text-red-500 transition-colors ${
+                      isMobile ? 'text-sm' : 'text-base'
+                    }`}>
+                      <Heart className={`${
+                        isMobile ? 'w-4 h-4' : 'w-5 h-5'
+                      }`} />
+                      <span>{selectedVideo.likes}</span>
+                    </button>
+                    <button className={`flex items-center gap-2 hover:text-blue-500 transition-colors ${
+                      isMobile ? 'text-sm' : 'text-base'
+                    }`}>
+                      <MessageCircle className={`${
+                        isMobile ? 'w-4 h-4' : 'w-5 h-5'
+                      }`} />
+                      <span>Comments</span>
+                    </button>
+                    <button className={`flex items-center gap-2 hover:text-green-500 transition-colors ${
+                      isMobile ? 'text-sm' : 'text-base'
+                    }`}>
+                      <Share className={`${
+                        isMobile ? 'w-4 h-4' : 'w-5 h-5'
+                      }`} />
+                      <span>Share</span>
+                    </button>
+                  </div>
+
+                  {/* Mobile Controls */}
+                  {isMobile && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={toggleMute}
+                        className="bg-gray-100 p-1.5 rounded-full active:scale-95 transition-transform"
+                        aria-label={isMuted ? "Unmute video" : "Mute video"}
+                      >
+                        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                      </button>
+                      <span className="text-xs text-gray-600 font-medium">
+                        {selectedVideo.duration}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Navigation for Shorts */}
+                {selectedVideo.aspectRatio === '9:16' && (
+                  <div className="flex items-center justify-between pt-2">
+                    <button
+                      onClick={prevShort}
+                      className={`hover:bg-muted rounded-full transition-colors ${
+                        isMobile ? 'p-2' : 'p-2'
+                      }`}
+                      aria-label="Previous video"
+                    >
+                      <ChevronLeft className={`text-gray-600 ${
+                        isMobile ? 'w-4 h-4' : 'w-5 h-5'
+                      }`} />
+                    </button>
+
+                    <span className={`text-gray-600 font-medium ${
+                      isMobile ? 'text-xs' : 'text-sm'
+                    }`}>
+                      {currentShortIndex + 1} of {videoShorts.length}
+                    </span>
+
+                    <button
+                      onClick={nextShort}
+                      className={`hover:bg-muted rounded-full transition-colors ${
+                        isMobile ? 'p-2' : 'p-2'
+                      }`}
+                      aria-label="Next video"
+                    >
+                      <ChevronRight className={`text-gray-600 ${
+                        isMobile ? 'w-4 h-4' : 'w-5 h-5'
+                      }`} />
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </>

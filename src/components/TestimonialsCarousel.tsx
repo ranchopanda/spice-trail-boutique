@@ -1,24 +1,15 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-=======
 import { Card, CardContent } from "@/components/ui/shared";
->>>>>>> 8655cd6cf10711dafb5577c27fd18daac38b14c2
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-<<<<<<< HEAD
-} from "@/components/ui/carousel";
+} from "@/components/ui/shared";
 import { Star, Play, Pause, Volume2, VolumeX, X, CheckCircle, Award, Shield, Truck } from "lucide-react";
 import { Button } from "@/components/ui/shared";
-=======
-} from "@/components/ui/shared";
-import { Star } from "lucide-react";
->>>>>>> 8655cd6cf10711dafb5577c27fd18daac38b14c2
 
 interface Testimonial {
   id: number;
@@ -181,7 +172,7 @@ const TestimonialsCarousel = () => {
                           <div className="flex items-center gap-2">
                             <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
                             {testimonial.verified && (
-                              <CheckCircle className="w-4 h-4 text-green-500" title="Verified Purchase" />
+                              <CheckCircle className="w-4 h-4 text-green-500" />
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">{testimonial.role}</p>

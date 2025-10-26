@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
+import { getDemoVideo, safeImageUrl, safeVideoUrl } from "@/lib/demoAssets";
 
 // Enhanced components with premium effects
 const Button = ({ children, className = "", onClick, disabled }: {
@@ -91,8 +92,8 @@ const SimpleHero = () => {
       <div className="absolute inset-0">
         {/* Video Background with fallback */}
         <VideoBackground
-          videoUrl="https://player.vimeo.com/external/371433849.sd.mp4?s=12345" // Real farm video
-          fallbackImage="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=1920&h=1080&fit=crop&crop=center"
+          videoUrl={safeVideoUrl(undefined)} // Use demo video or fallback to image
+          fallbackImage={safeImageUrl(undefined, '/assets/hero-farm.jpg')} // Use demo hero image
         />
 
         {/* Farm Heritage Patterns */}

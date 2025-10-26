@@ -1,30 +1,25 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
-import { Button, useToast } from "@/components/ui/shared";
-import confetti from "canvas-confetti";
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  maxStock: number;
-  addedAt: string;
-}
-=======
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Plus, Minus, Trash2, X, ExternalLink, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/shared/Button";
+import { Button } from "@/components/ui/shared";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/components/ui/shared";
->>>>>>> 8655cd6cf10711dafb5577c27fd18daac38b14c2
+import confetti from "canvas-confetti";
 
 const SimpleCart = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { items, updateQuantity, removeItem, clearCart, createCheckout, isLoading } = useCartStore();
   const { success, error: showError } = useToast();
+  const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const getTotalItems = () => {
     return items.reduce((sum, item) => sum + item.quantity, 0);
@@ -39,28 +34,11 @@ const SimpleCart = () => {
     };
   };
 
-  const handleCheckout = async () => {
-    if (items.length === 0) return;
-
-    try {
-      await createCheckout();
-      const url = useCartStore.getState().checkoutUrl;
-      if (url) {
-        window.open(url, '_blank');
-        success("Redirecting to Shopify checkout...");
-      }
-    } catch (error) {
-      console.error('Checkout failed:', error);
-      showError("Unable to create checkout. Please try again.");
-    }
-<<<<<<< HEAD
-  }, [cartItems]);
-
-  const getTotalItems = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const getTotalPrice = () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
   // 🎉 Million-Dollar Confetti Celebration
   const triggerConfetti = () => {
+    if (hasTriggeredConfetti) return;
+    setHasTriggeredConfetti(true);
+
     const duration = 3000;
     const animationEnd = Date.now() + duration;
 
@@ -73,6 +51,7 @@ const SimpleCart = () => {
 
       if (timeLeft <= 0) {
         clearInterval(interval);
+        setHasTriggeredConfetti(false);
         return;
       }
 
@@ -110,70 +89,55 @@ const SimpleCart = () => {
     }, 250);
   };
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      removeItem(id);
-      return;
-    }
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
 
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.min(newQuantity, item.maxStock) }
-          : item
-      )
-    );
-=======
->>>>>>> 8655cd6cf10711dafb5577c27fd18daac38b14c2
+    try {
+      await createCheckout();
+      const url = useCartStore.getState().checkoutUrl;
+      if (url) {
+        window.open(url, '_blank');
+        success("Redirecting to Shopify checkout...");
+      }
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      showError("Unable to create checkout. Please try again.");
+    }
   };
 
   useEffect(() => {
     const handleCartAddSuccess = () => {
       setIsOpen(true);
     };
-    
+
     window.addEventListener('cart-add-success', handleCartAddSuccess);
     return () => window.removeEventListener('cart-add-success', handleCartAddSuccess);
   }, []);
 
   return (
     <>
-<<<<<<< HEAD
-      {/* Floating Cart Trigger */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          className="simple-cart bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-2xl hover:shadow-primary/25 transform hover:scale-110 active:scale-95 transition-all"
-          onClick={() => {
-            setIsOpen(true);
-            // 🎉 Trigger confetti when opening cart with items
-            if (getTotalItems() > 0) {
-              setTimeout(() => triggerConfetti(), 300);
-            }
-          }}
-        >
-          <ShoppingCart className="w-6 h-6" />
-
-          {/* Item count badge */}
-          {getTotalItems() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center min-w-[24px]">
-              {getTotalItems() > 99 ? "99+" : getTotalItems()}
-            </span>
-          )}
-        </button>
-      </div>
-=======
-      {/* Floating Cart Button */}
+      {/* Floating Cart Button - Mobile Optimized */}
       <motion.button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl hover:scale-110 transition-transform"
-        whileHover={{ scale: 1.1 }}
+        onClick={() => {
+          setIsOpen(true);
+          if (getTotalItems() > 0 && !isMobile) {
+            // Only trigger confetti on desktop for performance
+            setTimeout(() => triggerConfetti(), 300);
+          }
+        }}
+        className={`fixed z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl transition-transform active:scale-95 ${
+          isMobile
+            ? 'bottom-6 right-6'
+            : 'bottom-6 right-6 hover:scale-110'
+        }`}
+        whileHover={!isMobile ? { scale: 1.1 } : {}}
         whileTap={{ scale: 0.95 }}
         animate={{
-          scale: getTotalItems() > 0 ? [1, 1.1, 1] : 1,
+          scale: getTotalItems() > 0 && !isMobile ? [1, 1.1, 1] : 1,
         }}
         transition={{
           duration: 0.3,
-          repeat: getTotalItems() > 0 ? Infinity : 0,
+          repeat: getTotalItems() > 0 && !isMobile ? Infinity : 0,
           repeatDelay: 2,
         }}
       >
@@ -182,15 +146,18 @@ const SimpleCart = () => {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold"
+            className={`absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs font-bold ${
+              isMobile
+                ? 'w-7 h-7 min-h-[28px] min-w-[28px]' // Larger on mobile
+                : 'w-6 h-6 min-h-[24px] min-w-[24px]'
+            }`}
           >
             {getTotalItems()}
           </motion.span>
         )}
       </motion.button>
->>>>>>> 8655cd6cf10711dafb5577c27fd18daac38b14c2
 
-      {/* Cart Panel */}
+      {/* Cart Modal - Fully Responsive */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -203,148 +170,222 @@ const SimpleCart = () => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Cart Drawer */}
+            {/* Cart Panel - Adaptive Layout */}
             <motion.div
-              className="fixed top-0 right-0 h-full w-full max-w-md bg-background shadow-2xl z-50 flex flex-col"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              className={`bg-background shadow-2xl z-50 flex flex-col ${
+                isMobile
+                  ? 'fixed inset-x-0 bottom-0 rounded-t-xl max-h-[90vh]'
+                  : 'fixed top-0 right-0 h-full w-full max-w-md'
+              }`}
+              initial={{
+                ...(isMobile
+                  ? { y: "100%" }
+                  : { x: "100%" }
+                )
+              }}
+              animate={{
+                ...(isMobile
+                  ? { y: 0 }
+                  : { x: 0 }
+                )
+              }}
+              exit={{
+                ...(isMobile
+                  ? { y: "100%" }
+                  : { x: "100%" }
+                )
+              }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
+              {/* Mobile Handle */}
+              {isMobile && (
+                <div className="flex justify-center py-2 pb-4">
+                  <div className="w-12 h-1 bg-muted-foreground/30 rounded-full"></div>
+                </div>
+              )}
+
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b bg-card">
+              <div className={`flex items-center justify-between border-b bg-card ${
+                isMobile ? 'px-4 py-3' : 'p-6'
+              }`}>
                 <div className="flex items-center gap-3">
-                  <ShoppingCart className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-bold">Your Cart</h2>
+                  <ShoppingCart className={`text-primary ${
+                    isMobile ? 'w-5 h-5' : 'w-6 h-6'
+                  }`} />
+                  <h2 className={`font-bold ${
+                    isMobile ? 'text-lg' : 'text-xl'
+                  }`}>Your Cart</h2>
                   <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm font-semibold">
                     {getTotalItems()}
                   </span>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-muted rounded-full transition-colors"
+                  className={`hover:bg-muted rounded-full transition-colors ${
+                    isMobile ? 'p-2' : 'p-2'
+                  }`}
                 >
-                  <X className="w-5 h-5" />
+                  <X className={`${
+                    isMobile ? 'w-5 h-5' : 'w-5 h-5'
+                  }`} />
                 </button>
               </div>
 
               {/* Cart Items */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className={`flex-1 overflow-y-auto ${
+                isMobile ? 'px-4 py-2' : 'p-6'
+              }`}>
                 {items.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                    <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
-                    <p className="text-lg font-semibold text-muted-foreground">Your cart is empty</p>
-                    <p className="text-sm text-muted-foreground mt-2">Add some products to get started!</p>
+                  <div className={`flex flex-col items-center justify-center h-full text-center ${
+                    isMobile ? 'py-8' : 'py-12'
+                  }`}>
+                    <ShoppingCart className={`text-muted-foreground mb-4 opacity-50 ${
+                      isMobile ? 'w-12 h-12' : 'w-16 h-16'
+                    }`} />
+                    <p className={`font-semibold text-muted-foreground mb-2 ${
+                      isMobile ? 'text-base' : 'text-lg'
+                    }`}>Your cart is empty</p>
+                    <p className={`text-muted-foreground ${
+                      isMobile ? 'text-sm' : 'text-sm'
+                    }`}>Add some products to get started!</p>
                   </div>
                 ) : (
-                  items.map((item) => {
-                    const productNode = item.product.node;
-                    const firstImage = productNode.images.edges[0]?.node;
-                    
-                    return (
-                      <motion.div
-                        key={item.variantId}
-                        layout
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        className="flex gap-4 bg-card p-4 rounded-xl shadow-sm"
-                      >
-                        {/* Product Image */}
-                        <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden shrink-0">
-                          {firstImage ? (
-                            <img 
-                              src={firstImage.url} 
-                              alt={productNode.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ShoppingCart className="w-8 h-8 text-muted-foreground/50" />
-                            </div>
-                          )}
-                        </div>
+                  <div className={`space-y-3 ${isMobile ? 'mb-2' : 'space-y-4'}`}>
+                    {items.map((item) => {
+                      const productNode = item.product.node;
+                      const firstImage = productNode.images.edges[0]?.node;
 
-                        {/* Item Details */}
-                        <div className="flex-1 space-y-2">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-semibold text-foreground">{productNode.title}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {item.price.currencyCode} {parseFloat(item.price.amount).toFixed(2)}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => removeItem(item.variantId)}
-                              className="text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                      return (
+                        <motion.div
+                          key={item.variantId}
+                          layout
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          className={`bg-card rounded-lg shadow-sm flex gap-4 ${
+                            isMobile ? 'p-3' : 'p-4'
+                          }`}
+                        >
+                          {/* Product Image */}
+                          <div className={`bg-muted rounded-lg overflow-hidden shrink-0 ${
+                            isMobile ? 'w-16 h-16' : 'w-20 h-20'
+                          }`}>
+                            {firstImage ? (
+                              <img
+                                src={firstImage.url}
+                                alt={productNode.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ShoppingCart className="w-6 h-6 text-muted-foreground/50" />
+                              </div>
+                            )}
                           </div>
 
-                          {/* Quantity Controls */}
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </Button>
-                            <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </Button>
-                            <span className="text-xs text-muted-foreground ml-auto">
-                              Subtotal: {item.price.currencyCode} {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
-                            </span>
+                          {/* Item Details */}
+                          <div className="flex-1 space-y-2">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`font-semibold text-foreground line-clamp-2 ${
+                                  isMobile ? 'text-sm leading-tight' : 'text-base'
+                                }`}>
+                                  {productNode.title}
+                                </h4>
+                                <p className="text-muted-foreground text-sm">
+                                  {item.price.currencyCode} {parseFloat(item.price.amount).toFixed(2)}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => removeItem(item.variantId)}
+                                className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            {/* Quantity Controls - Mobile Optimized */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                                <button
+                                  onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                                  className={`bg-white rounded text-gray-700 hover:bg-gray-50 transition-colors ${
+                                    isMobile ? 'w-8 h-8 p-0' : 'w-8 h-8 p-0'
+                                  }`}
+                                  aria-label="Decrease quantity"
+                                >
+                                  <Minus className={`${isMobile ? 'w-4 h-4' : 'w-3 h-3'}`} />
+                                </button>
+                                <span className={`font-medium text-center ${
+                                  isMobile ? 'w-10 text-base min-w-[40px]' : 'w-8 text-sm min-w-[32px]'
+                                }`}>
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                                  className={`bg-white rounded text-gray-700 hover:bg-gray-50 transition-colors ${
+                                    isMobile ? 'w-8 h-8 p-0' : 'w-8 h-8 p-0'
+                                  }`}
+                                  aria-label="Increase quantity"
+                                >
+                                  <Plus className={`${isMobile ? 'w-4 h-4' : 'w-3 h-3'}`} />
+                                </button>
+                              </div>
+                              <span className={`text-muted-foreground font-medium ${
+                                isMobile ? 'text-xs' : 'text-xs'
+                              }`}>
+                                {item.price.currencyCode} {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
 
-              {/* Cart Summary */}
-              <div className="border-t border-border p-6 space-y-4 bg-muted/30">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Items:</span>
-                  <span className="font-semibold">{getTotalItems()}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total:</span>
-                  <span className="text-primary">
-                    {getTotalPrice().currencyCode} {getTotalPrice().amount}
-                  </span>
-                </div>
+              {/* Cart Summary - Fixed at Bottom */}
+              {getTotalItems() > 0 && (
+                <div className={`border-t border-border ${
+                  isMobile ? 'p-4 space-y-3' : 'p-6 space-y-4'
+                } bg-muted/30`}>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total Items:</span>
+                    <span className="font-semibold">{getTotalItems()}</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total:</span>
+                    <span className="text-primary">
+                      {getTotalPrice().currencyCode} {getTotalPrice().amount}
+                    </span>
+                  </div>
 
-                <div className="space-y-2">
-                  <Button
-                    onClick={handleCheckout}
-                    className="w-full"
-                    size="lg"
-                    disabled={items.length === 0 || isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Creating Checkout...
-                      </>
-                    ) : (
-                      <>
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Checkout with Shopify
-                      </>
-                    )}
-                  </Button>
-                  {items.length > 0 && (
+                  <div className={`space-y-2 ${isMobile ? 'space-y-2' : 'space-y-2'}`}>
+                    <Button
+                      onClick={handleCheckout}
+                      className={`w-full font-semibold ${
+                        isMobile ? 'py-3 text-base' : 'py-2'
+                      }`}
+                      size={isMobile ? "lg" : "lg"}
+                      disabled={items.length === 0 || isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className={`animate-spin ${
+                            isMobile ? 'w-5 h-5 mr-2' : 'w-4 h-4 mr-2'
+                          }`} />
+                          Creating Checkout...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className={`${
+                            isMobile ? 'w-5 h-5 mr-2' : 'w-4 h-4 mr-2'
+                          }`} />
+                          Checkout Now
+                        </>
+                      )}
+                    </Button>
                     <Button
                       onClick={clearCart}
                       variant="outline"
@@ -352,9 +393,9 @@ const SimpleCart = () => {
                     >
                       Clear Cart
                     </Button>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           </>
         )}
